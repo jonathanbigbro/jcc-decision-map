@@ -1,0 +1,12 @@
+work/
+__pycache__/
+node_modules/
+dist/
+releases/
+*.py[cod]
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+*.log

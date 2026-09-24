@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>定阵导航 · 金铲铲开局决策</title><link rel="icon" href="data:,"><style>/* STYLES */</style></head>
+<body>
+<header class="topbar"><div class="brand"><span class="brandmark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><h1>定阵导航</h1><span class="tagline">开局有线索，定阵有依据</span></div><div class="header-actions"><div class="version-panel"><span id="liveVersion">数据源版本待核对</span><span id="snapshotVersion">阵容库 18.2a · 2026-09-21</span></div><button id="checkVersionBtn" class="plain">检查版本</button><button id="logicBtn" class="plain">决策逻辑</button><button id="resetBtn" class="plain">重置</button></div></header>
+<main class="workspace">
+<aside class="input-rail">
+ <div class="section-title"><h2>当前开局</h2><span class="small" id="inputCount">尚未录入</span></div>
+ <button class="upload" id="uploadBtn"><span class="upload-icon">＋</span><span><b>从截图录入</b><small>识别文字 → 校对 → 加入开局</small></span><span>↗</span></button>
+ <select id="preset" aria-label="选择示例开局"><option value="">或试试一个示例开局</option><option value="cait">女警来牌 · 攻速物理装</option><option value="kayle">天使来牌 · 法强攻速装</option><option value="red">小红来牌 · 技能物理装</option><option value="inferno">纹章开局 · 地狱火上限</option><option value="danger">低血量 · 九五止损</option></select>
+ <div class="fields three"><label>阶段<select id="stage"><option>2-1</option><option>2-5</option><option>3-1</option><option>3-2</option><option>3-5</option><option>4-1</option><option>4-2</option><option>5-1</option></select></label><label>生命值<input id="hp" type="number" min="1" max="100" value="100"></label><label>金币<input id="gold" type="number" min="0" max="200" value="10"></label></div>
+ <div class="fields two"><label>等级<select id="level"><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></label><label>当前场面<select id="strength"><option value="unknown">还不确定</option><option value="strong">强势 / 连胜</option><option value="weak">较弱 / 掉血</option></select></label></div>
+ <section class="input-section"><div class="section-title"><h3>已有英雄</h3><button class="text-btn" data-picker="heroes">＋ 添加</button></div><p class="small">按总张数录入：1个二星 = 3张</p><div id="selectedHeroes" class="selected-list"></div></section>
+ <section class="input-section"><div class="section-title"><h3>已有装备</h3><button class="text-btn" data-picker="items">＋ 成装 / 纹章 / 神器</button></div><p class="small">散件点一下加1；成装不重复计散件</p><div id="componentGrid" class="component-grid"></div><div id="selectedItems" class="selected-list"></div><button class="special-launch" data-open-combos>纹章 / 神器给谁最合适？ <span>→</span></button></section>
+ <section class="input-section"><div class="section-title"><h3>已选海克斯</h3><button class="text-btn" data-picker="augments">＋ 添加</button></div><div id="selectedAugments" class="selected-list"></div><label class="checkline"><input id="econ" type="checkbox">本局有额外金币 / 经验收益</label></section>
+ <div class="rail-footer"><span class="auto-dot"></span>修改输入后，推荐自动更新</div>
+</aside>
+<section class="canvas-area">
+ <div class="view-tabs" role="group" aria-label="切换推荐视图"><button id="mapTab" class="active" aria-pressed="true">开局导图</button><button id="comboTab" aria-pressed="false">纹章 / 神器定阵 <span>NEW</span></button></div>
+ <div class="canvas-head" id="mapHead"><div><h2>你的定阵路径</h2><p id="mapSubtitle">从左侧录入开局，看适合你的阵容分支</p></div><button id="allStrategies" class="plain small-btn">综合视图</button></div>
+ <div class="version-status" role="status"><p id="versionNotice">版本检查准备中，当前推荐使用本地阵容库。</p><span id="versionCheckDetail">打开时检查 · 每5分钟复查</span></div>
+ <section id="comboView" class="combo-view" hidden aria-label="纹章与神器搭配推荐">
+  <div class="combo-heading"><div><h2>从一件装备，找到一套体系</h2><p>看谁来带、怎么配装，再判断这局能不能走。</p></div><button class="text-btn" id="comboMethod">排序依据 ↗</button></div>
+  <div class="combo-toolbar"><input id="comboSearch" type="search" aria-label="搜索纹章或神器" placeholder="搜索：地狱火、纳沃利、魔蕴…"><select id="comboKind" aria-label="装备类型"><option value="all">纹章与神器</option><option value="emblem">只看纹章</option><option value="artifact">只看神器</option></select><label class="checkline"><input id="comboOwned" type="checkbox">只看已有</label></div>
+  <div id="comboCatalog" class="combo-catalog" aria-label="选择要研究的装备"></div>
+  <div id="comboItem"></div>
+  <div class="combo-result-head"><span id="comboResultCount"></span><label>排序 <select id="comboSort"><option value="fit">结合我的开局</option><option value="sample">按样本表现</option></select></label></div>
+  <div id="comboResults" class="combo-results"></div>
+  <p class="combo-footnote" id="comboFootnote"></p>
+ </section>
+ <p class="mobile-map-hint">左右滑动查看完整导图 →</p><div class="map-viewport" id="mapViewport"><div class="map-inner" id="mindmap"></div></div>
+ <div class="timeline"><h3>下一步时间点</h3><div class="timeline-steps"><div><b class="step">1</b><span><strong>2-1 保留方向</strong><small>先看装备、来牌与强化</small></span></div><i>→</i><div><b class="step">2</b><span><strong>2-5 复核来牌</strong><small>补二星、看同行与血量</small></span></div><i>→</i><div><b class="step">3</b><span><strong>3-2 决定投入</strong><small>多条条件一致再定阵</small></span></div></div></div>
+ <div class="canvas-foot"><span>匹配分反映开局契合度，不是胜率</span><button id="poolBtn" class="text-btn">查看全部 12 条路线 →</button></div>
+</section>
+<aside class="inspector" id="inspector" aria-live="polite"></aside>
+</main>
+<dialog id="pickerDialog"><div class="dialog-top"><div><h2 id="pickerTitle">添加英雄</h2><p class="small" id="pickerHelp"></p></div><button class="close" data-close="pickerDialog" aria-label="关闭选择器">×</button></div><input type="search" id="pickerSearch" placeholder="搜索名称" aria-label="搜索名称"><div id="pickerFilters" class="filters"></div><div id="pickerGrid" class="picker-grid"></div><div class="dialog-bottom"><span id="pickerStatus" class="small"></span><button class="primary" data-close="pickerDialog">完成选择</button></div></dialog>
+<dialog id="screenshotDialog" class="wide-dialog"><div class="dialog-top"><div><h2>从截图录入</h2><p class="small">截图在本机处理。文字候选需校对；无文字头像、商店卡和数量请手动确认。</p></div><button class="close" data-close="screenshotDialog" aria-label="关闭截图录入">×</button></div><div class="capture-layout"><div><label class="file-drop">选择游戏截图<input type="file" id="screenshotFile" accept="image/png,image/jpeg,image/webp"></label><div class="shot-wrap"><img id="shotPreview" alt="待识别的游戏截图" hidden></div><div class="capture-actions"><button id="ocrBtn" class="primary" disabled>识别截图文字</button><button id="clearShot" class="plain">清除截图</button></div><p id="ocrStatus" class="small" role="status">建议截图中包含英雄、装备或海克斯名称。</p></div><div><label class="textarea-label" for="ocrText">识别文字，可手动修正</label><textarea id="ocrText" rows="5" placeholder="也可粘贴截图中读到的文字"></textarea><button id="matchTextBtn" class="plain">匹配已有图鉴</button><div id="ocrCandidates" class="ocr-candidates"><p class="small">识别到的名字会显示在这里，不会自动计入已拥有。</p></div><p class="small">只勾选自己已拥有的内容；商店、选项中的内容不要直接加入。</p><button id="applyOcr" class="primary" disabled>确认勾选并加入开局</button></div></div></dialog>
+<dialog id="infoDialog" class="info-dialog"><div class="dialog-top"><h2 id="infoTitle"></h2><button class="close" data-close="infoDialog" aria-label="关闭说明">×</button></div><div id="infoBody"></div></dialog>
+<div id="toast" class="toast" role="status"></div>
+<script>/* DATA */</script>
+<script>/* SYNERGY_DATA */</script>
+<script>/* SYNERGY_ENGINE */</script>
+<script>/* ENGINE */</script>
+<script>/* APP */</script>
+<script>/* SYNERGY_APP */</script>
+<script>/* VERSION */</script>
+</body></html>
